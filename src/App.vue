@@ -1,12 +1,12 @@
 <template>
   <v-app>
+    <v-app-bar title="WGPU Memory Layout Visualizer"></v-app-bar>
     <v-main>
-      <HelloWorld />
+      <WgslInput />
     </v-main>
-
   </v-app>
 </template>
 
 <script lang="ts" setup>
-  import HelloWorld from '@/components/HelloWorld.vue'
+import WgslInput from "@/components/WgslInput.vue";
 </script>

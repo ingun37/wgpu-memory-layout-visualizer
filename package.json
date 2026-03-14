@@ -13,8 +13,10 @@
   "dependencies": {
     "@fontsource/roboto": "^5.2.9",
     "@mdi/font": "7.4.47",
+    "prettier": "^3.8.1",
     "vue": "^3.5.26",
-    "vuetify": "^4.0.0"
+    "vuetify": "^4.0.0",
+    "wgsl_reflect": "^1.2.3"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.5",
