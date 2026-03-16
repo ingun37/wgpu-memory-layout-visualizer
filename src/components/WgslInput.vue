@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { WgslReflect, type StructInfo } from "wgsl_reflect";
 import MemoryLayout from "./MemoryLayout.vue";
+import { generateRustStruct } from "../utils/rust_converter";
 
 const wgslCode = ref(`struct _MatrixStorage_float4x4_ColMajorstd140_0
 {
@@ -105,11 +106,20 @@ struct SLANG_ParameterGroup_pixelCB_std140_0
 };`);
 
 const structs = ref<StructInfo[]>([]);
+const showAllRustCode = ref(false);
+
+const allRustCode = computed(() => {
+  return structs.value.map((s) => generateRustStruct(s)).join("\n\n");
+});
 
 function compile() {
   const reflect = new WgslReflect(wgslCode.value);
   structs.value = reflect.structs;
   console.log(reflect);
+}
+
+function copyAllToClipboard() {
+  navigator.clipboard.writeText(allRustCode.value);
 }
 </script>
 
@@ -124,7 +134,36 @@ function compile() {
           variant="outlined"
           font-family="monospace"
         ></v-textarea>
-        <v-btn color="primary" @click="compile">Compile</v-btn>
+        <div class="d-flex align-center">
+          <v-btn color="primary" @click="compile" class="mr-2">Compile</v-btn>
+          <v-btn
+            v-if="structs.length > 0"
+            color="secondary"
+            variant="tonal"
+            @click="showAllRustCode = !showAllRustCode"
+          >
+            {{ showAllRustCode ? "Hide All Rust" : "Convert All to Rust" }}
+          </v-btn>
+        </div>
+      </v-col>
+    </v-row>
+
+    <v-row v-if="showAllRustCode && structs.length > 0">
+      <v-col cols="12">
+        <v-card variant="outlined" class="pa-4 mb-4">
+          <v-card-title class="d-flex justify-space-between align-center">
+            All Rust Structs
+            <v-btn size="small" variant="text" @click="copyAllToClipboard">
+              Copy All
+            </v-btn>
+          </v-card-title>
+          <v-card-text>
+            <pre
+              class="rust-code pa-2 bg-grey-darken-4 text-grey-lighten-3 rounded"
+              >{{ allRustCode }}</pre
+            >
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
 
@@ -141,4 +180,11 @@ function compile() {
   </v-container>
 </template>
 
-<style scoped></style>
+<style scoped>
+.rust-code {
+  font-family: "Fira Code", "Courier New", Courier, monospace;
+  font-size: 0.8rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+</style>
